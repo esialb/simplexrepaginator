@@ -1,4 +1,4 @@
-package com.robinkirkman.repaginate;
+package com.simplexrepaginator;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

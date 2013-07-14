@@ -1,4 +1,4 @@
-package com.robinkirkman.repaginate;
+package com.simplexrepaginator;
 
 import javax.swing.JFrame;
 import javax.swing.UIManager;

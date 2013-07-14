@@ -1,4 +1,4 @@
-package com.robinkirkman.repaginate;
+package com.simplexrepaginator;
 
 import java.io.IOException;
 import java.util.ArrayList;
