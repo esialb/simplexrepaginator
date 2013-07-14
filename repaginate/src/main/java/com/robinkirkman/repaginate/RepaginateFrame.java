@@ -10,12 +10,14 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.TransferHandler;
@@ -31,12 +33,12 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 public class RepaginateFrame extends JFrame {
 	private static IOFileFilter IS_PDF_FILE = new SuffixFileFilter("pdf", IOCase.INSENSITIVE);
 
-	protected List<File> inputFiles;
+	protected List<File> inputFiles = Collections.emptyList();
 	protected JButton input;
 	protected JButton repaginate;
 	protected JButton unrepaginate;
 	protected JButton output;
-	protected List<File> outputFiles;
+	protected List<File> outputFiles = Collections.emptyList();
 
 	public RepaginateFrame() {
 		super("Repaginate");
@@ -160,9 +162,21 @@ public class RepaginateFrame extends JFrame {
 	}
 
 	protected JButton createInputButton() {
-		JButton b = new JButton("Click or drag to set input file");
+		JButton b = new JButton("Click or drag to set input files");
 
 		b.setTransferHandler(new InputButtonTransferHandler());
+		
+		b.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.setMultiSelectionEnabled(true);
+				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				if(chooser.showOpenDialog(RepaginateFrame.this) != JFileChooser.APPROVE_OPTION)
+					return;
+				setInput(Arrays.asList(chooser.getSelectedFiles()));
+			}
+		});
 
 		return b;
 	}
@@ -171,6 +185,18 @@ public class RepaginateFrame extends JFrame {
 		JButton b = new JButton("Click or drag to set output file");
 
 		b.setTransferHandler(new OutputButtonTransferHandler());
+		
+		b.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.setMultiSelectionEnabled(false);
+				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				if(chooser.showOpenDialog(RepaginateFrame.this) != JFileChooser.APPROVE_OPTION)
+					return;
+				setInput(Arrays.asList(chooser.getSelectedFiles()));
+			}
+		});
 
 		return b;
 	}
