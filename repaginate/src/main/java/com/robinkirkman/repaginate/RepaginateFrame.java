@@ -48,17 +48,17 @@ public class RepaginateFrame extends JFrame {
 
 		setLayout(new GridBagLayout());
 
-		GridBagConstraints c = new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(10, 10, 10, 10), 10, 10);
+		GridBagConstraints c = new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(10, 10, 10, 10), 10, 10);
 
 		c.gridwidth = 2; add(input, c);
 
-		c.gridy++; c.gridwidth = 1; add(repaginate, c);
+		c.gridy++; c.gridwidth = 1; c.fill = GridBagConstraints.NONE; add(repaginate, c);
 		c.gridx++; add(unrepaginate, c);
 
-		c.gridy++; c.gridx = 0; c.gridwidth = 2; add(output, c);
+		c.gridy++; c.gridx = 0; c.gridwidth = 2; c.fill = GridBagConstraints.BOTH; add(output, c);
 
 		pack();
-		setSize(400, 400);
+		setSize(800, 400);
 	}
 
 	protected JButton createRepaginateButton() {
