@@ -16,14 +16,18 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.TransferHandler;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOCase;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -43,6 +47,8 @@ public class RepaginateFrame extends JFrame {
 	public RepaginateFrame() {
 		super("Repaginate");
 
+		setJMenuBar(createMenuBar());
+		
 		input = createInputButton();
 		repaginate = createRepaginateButton();
 		unrepaginate = createUnrepaginateButton();
@@ -63,6 +69,28 @@ public class RepaginateFrame extends JFrame {
 		setSize(800, 400);
 	}
 
+	protected JMenuBar createMenuBar() {
+		JMenuBar mb = new JMenuBar();
+		JMenu m;
+		
+		m = new JMenu("Help");
+		m.add(new AbstractAction("About") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String license;
+				try {
+					license = IOUtils.toString(RepaginateFrame.class.getResource("LICENSE.txt"));
+				} catch(IOException ioe) {
+					license = "An error occured reading the license file:\n" + ioe;
+				}
+				JOptionPane.showMessageDialog(RepaginateFrame.this, license);
+			}
+		});
+		mb.add(m);
+		
+		return mb;
+	}
+	
 	protected JButton createRepaginateButton() {
 		JButton b = new JButton("<html><center>Click to<br>repaginate");
 
