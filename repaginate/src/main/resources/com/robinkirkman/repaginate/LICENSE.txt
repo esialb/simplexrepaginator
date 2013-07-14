@@ -1,1 +1,8 @@
 LICENSE
+
+Repaginate is released under an Apache Open-Source License 2.0.
+
+Repaginate uses the following open-source libraries:
+* Apache PDFBox
+* Apache Commons Lang
+* Apache Commons IO
