@@ -45,7 +45,7 @@ public class RepaginateFrame extends JFrame {
 	protected List<File> outputFiles = Collections.emptyList();
 
 	public RepaginateFrame() {
-		super("Repaginate");
+		super("Simplex Repaginator");
 
 		setJMenuBar(createMenuBar());
 		
