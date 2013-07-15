@@ -93,6 +93,18 @@ public class RepaginateFrame extends JFrame {
 		JMenu m;
 		
 		m = new JMenu("File");
+		m.add(new AbstractAction("Select Input") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				input.doClick();
+			}
+		});
+		m.add(new AbstractAction("Select Output") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				output.doClick();
+			}
+		});
 		m.add(new AbstractAction("Exit") {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
