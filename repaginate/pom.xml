@@ -5,6 +5,11 @@
 	<groupId>com.simplexrepaginator</groupId>
 	<artifactId>repaginate</artifactId>
 	<version>0.0.1</version>
+
+	<properties>
+		<simplex.shaded.suffix></simplex.shaded.suffix>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
@@ -63,7 +68,7 @@
 						</goals>
 						<configuration>
 							<shadedArtifactAttached>true</shadedArtifactAttached>
-							<finalName>SimplexRepaginator-${project.version}</finalName>
+							<finalName>SimplexRepaginator${simplex.shaded.suffix}</finalName>
 							<filters>
 								<filter>
 									<artifact>*:*</artifact>
@@ -84,5 +89,17 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
+	<profiles>
+		<profile>
+			<id>master</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<simplex.shaded.suffix>-${project.version}</simplex.shaded.suffix>
+			</properties>
+		</profile>
+	</profiles>
+
 </project>
