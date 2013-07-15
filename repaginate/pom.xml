@@ -7,7 +7,7 @@
 	<version>0.0.2-SNAPSHOT</version>
 
 	<properties>
-		<simplex.shaded.suffix></simplex.shaded.suffix>
+		<simplex.shaded.suffix>-${project.version}</simplex.shaded.suffix>
 	</properties>
 
 	<dependencies>
@@ -89,17 +89,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>master</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<simplex.shaded.suffix>-${project.version}</simplex.shaded.suffix>
-			</properties>
-		</profile>
-	</profiles>
-
 </project>
