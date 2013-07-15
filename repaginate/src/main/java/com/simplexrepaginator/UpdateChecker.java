@@ -32,11 +32,20 @@ public class UpdateChecker {
 		}
 	};
 	
-	public URL checkForUpdates() throws IOException {
-		String latest = IOUtils.toString(new URL("http://www.simplexrepaginator.com/downloads/version.txt"));
+	public String getLatestVersion() throws IOException {
+		return IOUtils.toString(new URL("http://www.simplexrepaginator.com/downloads/version.txt"));
+	}
+	
+	public boolean isUpdateAvailable() throws IOException {
+		String latest = getLatestVersion();
 		String current = Repaginate.getVersion();
+		return VERSION_ORDER.compare(current, latest) < 0;
+	}
+	
+	public URL getUpdateURL() throws IOException {
+		String latest = getLatestVersion();
 		
-		if(VERSION_ORDER.compare(current, latest) < 0)
+		if(isUpdateAvailable())
 			return new URL("http://www.simplexrepaginator.com/downloads/SimplexRepaginator-" + latest + ".jar");
 		else
 			return null;
