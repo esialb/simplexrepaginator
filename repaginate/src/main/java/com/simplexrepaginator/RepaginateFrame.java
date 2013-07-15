@@ -37,6 +37,11 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+/**
+ * Main application GUI frame
+ * @author robin
+ *
+ */
 public class RepaginateFrame extends JFrame {
 	private static IOFileFilter IS_PDF_FILE = new SuffixFileFilter("pdf", IOCase.INSENSITIVE);
 	
@@ -49,7 +54,8 @@ public class RepaginateFrame extends JFrame {
 
 	public RepaginateFrame() {
 		super("Simplex Repaginator version " + Repaginate.getVersion());
-
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		
 		setJMenuBar(createMenuBar());
 		
 		input = createInputButton();

@@ -15,6 +15,11 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.io.IOUtils;
 
+/**
+ * Main entry point.
+ * @author robin
+ *
+ */
 public class Repaginate {
 	private static final Options opt = new Options();
 	static {
@@ -30,10 +35,13 @@ public class Repaginate {
 	}
 	
 	private static void _main(String[] args) throws Exception {
+		// use system look and feel.  Shouldn't fail.
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		
+		// parse the command line
 		CommandLine cli = new PosixParser().parse(opt, args);
 		
+		// Frame which overrides #dispose() to exit
 		RepaginateFrame frame = new RepaginateFrame() {
 			@Override
 			public void dispose() {
@@ -42,17 +50,23 @@ public class Repaginate {
 			}
 		};
 
+		// input paths
 		List<File> input = new ArrayList<File>();
+		// output paths
 		List<File> output = new ArrayList<File>();
 
 		if(cli.getArgs().length > 0) {
-			for(String in : cli.getArgs()) {
-				input.add(new File(in));
+			// Parse input paths, either as separate args or separated with the path separator
+			for(String inArg : cli.getArgs()) {
+				for(String in : inArg.split(Pattern.quote(File.pathSeparator))) {
+					input.add(new File(in));
+				}
 			}
 			frame.setInput(input);
 		}
 		
 		if(cli.getOptionValues("out") != null) {
+			// parse output paths, either as separate args or separated with the path separator
 			for(String outArg : cli.getOptionValues("out")) {
 				for(String out : outArg.split(Pattern.quote(File.pathSeparator))) {
 					output.add(new File(out));
@@ -60,12 +74,17 @@ public class Repaginate {
 			}
 			frame.setOutput(output);
 		} else if(input.size() > 0) {
+			// there were no output paths but were input paths, so use the inputs as the outputs
 			frame.setOutput(new ArrayList<File>(input));
 		}
 		
 		frame.setVisible(true);
 	}
 
+	/**
+	 * Return the current version of Simplex Repaginator as a string
+	 * @return
+	 */
 	public static String getVersion() {
 		try {
 			return IOUtils.toString(Repaginate.class.getResource("version.txt"));
