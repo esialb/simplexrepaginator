@@ -219,6 +219,12 @@ public class RepaginateFrame extends JFrame {
 				if(chooser.showOpenDialog(RepaginateFrame.this) != JFileChooser.APPROVE_OPTION)
 					return;
 				setInput(Arrays.asList(chooser.getSelectedFiles()));
+				if(JOptionPane.showConfirmDialog(
+						RepaginateFrame.this, 
+						"Use input paths as output paths?", 
+						"Use Input As Output?", 
+						JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+					setOutput(new ArrayList<File>(inputFiles));
 			}
 		});
 
@@ -238,7 +244,7 @@ public class RepaginateFrame extends JFrame {
 				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				if(chooser.showOpenDialog(RepaginateFrame.this) != JFileChooser.APPROVE_OPTION)
 					return;
-				setInput(Arrays.asList(chooser.getSelectedFiles()));
+				setOutput(Arrays.asList(chooser.getSelectedFiles()));
 			}
 		});
 
@@ -287,7 +293,6 @@ public class RepaginateFrame extends JFrame {
 	public void setInput(List<File> files) {
 		input.setText("<html><center>" + StringUtils.join(files, "<br>"));
 		inputFiles = new ArrayList<File>(files);
-		setOutput(files);
 	}
 
 	public void setOutput(List<File> files) {
@@ -309,6 +314,12 @@ public class RepaginateFrame extends JFrame {
 		public boolean importData(TransferSupport support) {
 			try {
 				setInput((List<File>) support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor));
+				if(JOptionPane.showConfirmDialog(
+						RepaginateFrame.this, 
+						"Use input paths as output paths?", 
+						"Use Input As Output?", 
+						JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+					setOutput(new ArrayList<File>(inputFiles));
 				return true;
 			} catch(IOException ioe) {
 			} catch(UnsupportedFlavorException ufe) {
