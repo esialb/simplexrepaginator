@@ -37,19 +37,27 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
+/**
+ * Main application GUI frame
+ * @author robin
+ *
+ */
 public class RepaginateFrame extends JFrame {
 	private static IOFileFilter IS_PDF_FILE = new SuffixFileFilter("pdf", IOCase.INSENSITIVE);
 	
-	protected List<File> inputFiles = Collections.emptyList();
 	protected JButton input;
 	protected JButton repaginate;
 	protected JButton unrepaginate;
 	protected JButton output;
-	protected List<File> outputFiles = Collections.emptyList();
 
-	public RepaginateFrame() {
+	protected FileRepaginator repaginator;
+	
+	public RepaginateFrame(FileRepaginator repaginator) {
 		super("Simplex Repaginator version " + Repaginate.getVersion());
-
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		
+		this.repaginator = repaginator;
+		
 		setJMenuBar(createMenuBar());
 		
 		input = createInputButton();
@@ -76,8 +84,16 @@ public class RepaginateFrame extends JFrame {
 		JMenuBar mb = new JMenuBar();
 		JMenu m;
 		
-		m = new JMenu("Help");
+		m = new JMenu("File");
+		m.add(new AbstractAction("Exit") {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				dispose();
+			}
+		});
+		mb.add(m);
 		
+		m = new JMenu("Help");
 		m.add(new AbstractAction("Website") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -89,7 +105,6 @@ public class RepaginateFrame extends JFrame {
 				}
 			}
 		});
-		
 		m.add(new AbstractAction("About") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -113,47 +128,20 @@ public class RepaginateFrame extends JFrame {
 		b.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				repaginate();
+				try {
+					repaginator.repaginate();
+				} catch(Exception ex) {
+					ex.printStackTrace();
+					JOptionPane.showMessageDialog(
+							RepaginateFrame.this,
+							ex.toString(),
+							"Error During Repagination",
+							JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		
 		return b;
-	}
-
-	protected void repaginate() {
-		Repaginator repaginator = new Repaginator();
-
-		List<File[]> pairs;
-		try {
-			pairs = computeFilePairs();
-		} catch(RuntimeException re) {
-			JOptionPane.showMessageDialog(this, re);
-			return;
-		}
-		
-		List<Exception> exs = new ArrayList<Exception>();
-
-		int count = 0;
-		
-		for(File[] io : pairs) {
-			File in = io[0];
-			File out = io[1];
-
-			try {
-				PDDocument doc = PDDocument.load(in);
-				PDDocument rdoc = repaginator.repaginated(doc);
-				rdoc.save(out);
-				count++;
-			} catch(Exception ex) {
-				exs.add(ex);
-			}
-		}
-
-		if(exs.size() > 0) {
-			JOptionPane.showMessageDialog(this, StringUtils.join(exs, "\n"));
-		}
-		
-		JOptionPane.showMessageDialog(this, "Repaginated " + count + " documents");
 	}
 
 	protected JButton createUnrepaginateButton() {
@@ -162,49 +150,22 @@ public class RepaginateFrame extends JFrame {
 		b.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				unrepaginate();
+				try {
+					repaginator.unrepaginate();
+				} catch(Exception ex) {
+					ex.printStackTrace();
+					JOptionPane.showMessageDialog(
+							RepaginateFrame.this,
+							ex.toString(),
+							"Error During Unrepagination",
+							JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 
 		return b;
 	}
 	
-	protected void unrepaginate() {
-		Repaginator repaginator = new Repaginator();
-
-		List<File[]> pairs;
-		try {
-			pairs = computeFilePairs();
-		} catch(RuntimeException re) {
-			JOptionPane.showMessageDialog(this, re);
-			return;
-		}
-		
-		List<Exception> exs = new ArrayList<Exception>();
-
-		int count = 0;
-		
-		for(File[] io : pairs) {
-			File in = io[0];
-			File out = io[1];
-
-			try {
-				PDDocument doc = PDDocument.load(in);
-				PDDocument rdoc = repaginator.unrepaginated(doc);
-				rdoc.save(out);
-				count++;
-			} catch(Exception ex) {
-				exs.add(ex);
-			}
-		}
-
-		if(exs.size() > 0) {
-			JOptionPane.showMessageDialog(this, StringUtils.join(exs, "\n"));
-		}
-		
-		JOptionPane.showMessageDialog(this, "Repaginated " + count + " documents");
-	}
-
 	protected JButton createInputButton() {
 		JButton b = new JButton("Click or drag to set input files");
 
@@ -219,6 +180,13 @@ public class RepaginateFrame extends JFrame {
 				if(chooser.showOpenDialog(RepaginateFrame.this) != JFileChooser.APPROVE_OPTION)
 					return;
 				setInput(Arrays.asList(chooser.getSelectedFiles()));
+				if(JOptionPane.showConfirmDialog(
+						RepaginateFrame.this, 
+						"Use input paths as output paths?", 
+						"Use Input As Output?", 
+						JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+					setOutput(new ArrayList<File>(repaginator.getInputFiles()));
+				}
 			}
 		});
 
@@ -238,61 +206,22 @@ public class RepaginateFrame extends JFrame {
 				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				if(chooser.showOpenDialog(RepaginateFrame.this) != JFileChooser.APPROVE_OPTION)
 					return;
-				setInput(Arrays.asList(chooser.getSelectedFiles()));
+				repaginator.setOutputFiles(Arrays.asList(chooser.getSelectedFiles()));
+				output.setText("<html><center>" + StringUtils.join(repaginator.getOutputFiles(), "<br>"));
 			}
 		});
 
 		return b;
 	}
-
-	protected Collection<File> findPdfs(File f) {
-		if(f.isFile() && IS_PDF_FILE.accept(f))
-			return Collections.singleton(f);
-		else if(f.isDirectory())
-			return FileUtils.listFiles(f, IS_PDF_FILE, TrueFileFilter.INSTANCE);
-		else
-			return Collections.emptySet();
+	
+	protected void setInput(List<File> files) {
+		repaginator.setInputFiles(files);
+		input.setText("<html><center>" + StringUtils.join(repaginator.getInputFiles(), "<br>"));
 	}
-
-	protected List<File[]> computeFilePairs() {
-		List<File[]> ret = new ArrayList<File[]>();
-		if(inputFiles.size() > 0 && outputFiles.size() == 1 && outputFiles.get(0).isDirectory()) {
-			File out = outputFiles.get(0);
-			for(File in : inputFiles) {
-				for(File pdf : findPdfs(in)) {
-					ret.add(new File[] {pdf, new File(out, pdf.getName())});
-				}
-			}
-		} else if(inputFiles.size() == outputFiles.size()) {
-			Iterator<File> ifi = inputFiles.iterator();
-			Iterator<File> ofi = outputFiles.iterator();
-			while(ifi.hasNext() && ofi.hasNext()) {
-				File iFile = ifi.next();
-				File oFile = ofi.next();
-				if(iFile.isFile() && oFile.isFile()) {
-					if(IS_PDF_FILE.accept(iFile) && IS_PDF_FILE.accept(oFile))
-						ret.add(new File[] {iFile, oFile});
-				} else if(iFile.isDirectory() && oFile.isDirectory()) {
-					for(File pdf : findPdfs(iFile)) {
-						ret.add(new File[] {pdf, new File(oFile, pdf.getName())});
-					}
-				} else throw new RuntimeException("Mismatched file-file/directory-directory: " + iFile + " and " + oFile);
-			}
-		} else {
-			throw new RuntimeException("Not multiple input files with output file a directory and input file list differing in size from output file list.");
-		}
-		return ret;
-	}
-
-	public void setInput(List<File> files) {
-		input.setText("<html><center>" + StringUtils.join(files, "<br>"));
-		inputFiles = new ArrayList<File>(files);
-		setOutput(files);
-	}
-
-	public void setOutput(List<File> files) {
-		output.setText("<html><center>" + StringUtils.join(files, "<br>"));
-		outputFiles = new ArrayList<File>(files);
+	
+	protected void setOutput(List<File> files) {
+		repaginator.setOutputFiles(files);
+		output.setText("<html><center>" + StringUtils.join(repaginator.getOutputFiles(), "<br>"));
 	}
 
 	protected class InputButtonTransferHandler extends TransferHandler {
@@ -309,6 +238,12 @@ public class RepaginateFrame extends JFrame {
 		public boolean importData(TransferSupport support) {
 			try {
 				setInput((List<File>) support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor));
+				if(JOptionPane.showConfirmDialog(
+						RepaginateFrame.this, 
+						"Use input paths as output paths?", 
+						"Use Input As Output?", 
+						JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+					setOutput(new ArrayList<File>(repaginator.getInputFiles()));
 				return true;
 			} catch(IOException ioe) {
 			} catch(UnsupportedFlavorException ufe) {

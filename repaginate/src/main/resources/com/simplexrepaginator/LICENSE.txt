@@ -6,3 +6,4 @@ Repaginate uses the following open-source libraries:
 * Apache PDFBox
 * Apache Commons Lang
 * Apache Commons IO
+* Apache Commons CLI
