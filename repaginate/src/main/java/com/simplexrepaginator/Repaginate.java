@@ -34,8 +34,13 @@ public class Repaginate {
 		
 		CommandLine cli = new PosixParser().parse(opt, args);
 		
-		RepaginateFrame frame = new RepaginateFrame();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		RepaginateFrame frame = new RepaginateFrame() {
+			@Override
+			public void dispose() {
+				super.dispose();
+				System.exit(0);
+			}
+		};
 
 		List<File> input = new ArrayList<File>();
 		List<File> output = new ArrayList<File>();

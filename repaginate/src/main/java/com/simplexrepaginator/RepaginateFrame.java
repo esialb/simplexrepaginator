@@ -76,8 +76,16 @@ public class RepaginateFrame extends JFrame {
 		JMenuBar mb = new JMenuBar();
 		JMenu m;
 		
-		m = new JMenu("Help");
+		m = new JMenu("File");
+		m.add(new AbstractAction("Exit") {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				dispose();
+			}
+		});
+		mb.add(m);
 		
+		m = new JMenu("Help");
 		m.add(new AbstractAction("Website") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -89,7 +97,6 @@ public class RepaginateFrame extends JFrame {
 				}
 			}
 		});
-		
 		m.add(new AbstractAction("About") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
