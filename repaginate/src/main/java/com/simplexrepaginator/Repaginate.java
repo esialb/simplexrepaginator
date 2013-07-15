@@ -50,15 +50,8 @@ public class Repaginate {
 			return;
 		}
 
-		// Frame which overrides #dispose() to exit
-		RepaginateFrame frame = new RepaginateFrame() {
-			@Override
-			public void dispose() {
-				super.dispose();
-				System.exit(0);
-			}
-		};
-
+		FileRepaginator repaginator = new FileRepaginator();
+		
 		// input paths
 		List<File> input = new ArrayList<File>();
 		// output paths
@@ -71,7 +64,7 @@ public class Repaginate {
 					input.add(new File(in));
 				}
 			}
-			frame.setInput(input);
+			repaginator.setInputFiles(input);
 		}
 
 		if(cli.getOptionValues("out") != null) {
@@ -81,22 +74,35 @@ public class Repaginate {
 					output.add(new File(out));
 				}
 			}
-			frame.setOutput(output);
+			repaginator.setOutputFiles(output);
 		} else if(input.size() > 0) {
 			// there were no output paths but were input paths, so use the inputs as the outputs
-			frame.setOutput(new ArrayList<File>(input));
+			repaginator.setOutputFiles(input);
 		}
 
 		if(!cli.hasOption("batch")) {
+			// Frame which overrides #dispose() to exit
+			RepaginateFrame frame = new RepaginateFrame(repaginator) {
+				@Override
+				public void dispose() {
+					super.dispose();
+					System.exit(0);
+				}
+			};
+
 			frame.setVisible(true);
 		} else {
-			if(input.size() == 0)
+			if(input.size() == 0) {
 				System.out.println("No input files.  Try --help");
-			else if(cli.hasOption("unrepaginate"))
-				frame.unrepaginate(false);
+				return;
+			}
+			
+			int count;
+			if(cli.hasOption("unrepaginate"))
+				count = repaginator.unrepaginate();
 			else
-				frame.repaginate(false);
-			frame.dispose();
+				count = repaginator.repaginate();
+			System.out.println("Processed " + count + " documents");
 		}
 	}
 
