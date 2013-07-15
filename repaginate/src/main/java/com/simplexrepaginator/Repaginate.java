@@ -108,13 +108,9 @@ public class Repaginate {
 					count = repaginator.unrepaginate();
 				else
 					count = repaginator.repaginate();
-			} catch(RepaginatorException re) {
-				if(!cli.hasOption("quiet"))
-					System.out.println("Exceptions during command processing:\n\t" + StringUtils.join(re.getCauses(), "\n\t"));
-				return -1;
 			} catch(Exception ex) {
 				if(!cli.hasOption("quiet"))
-					System.out.println("Exception during command processing:\n\t" + ex);
+					System.out.println("Exception during command processing: " + ex);
 				return -1;
 			}
 			if(!cli.hasOption("quiet"))
