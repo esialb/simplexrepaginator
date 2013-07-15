@@ -1,6 +1,7 @@
 package com.simplexrepaginator;
 
 import java.awt.Desktop;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -25,6 +26,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -75,7 +77,7 @@ public class RepaginateFrame extends JFrame {
 
 		setLayout(new GridBagLayout());
 
-		GridBagConstraints c = new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0);
+		final GridBagConstraints c = new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0);
 
 		c.gridwidth = 2; add(input, c);
 
@@ -84,6 +86,30 @@ public class RepaginateFrame extends JFrame {
 
 		c.gridy++; c.gridx = 0; c.gridwidth = 2; c.fill = GridBagConstraints.BOTH; add(output, c);
 
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				UpdateChecker uc = new UpdateChecker();
+				try {
+					if(!uc.isUpdateAvailable())
+						return;
+					final JLabel label = new JLabel(
+							"<html>Simplex Repaginator version " + uc.getLatestVersion() + " is available.  "
+									+ "Choose <b>File > Check For Updates</b> to download.");
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							c.gridy++; c.weighty = 0; c.fill = GridBagConstraints.HORIZONTAL;
+							add(label, c);
+							revalidate();
+						}
+					});
+				} catch(IOException ioe) {
+				}
+			}
+		};
+		new Thread(r).start();
+		
 		pack();
 		setSize(800, 400);
 	}
@@ -103,6 +129,37 @@ public class RepaginateFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				output.doClick();
+			}
+		});
+		m.add(new AbstractAction("Check For Updates") {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					URL updated = new UpdateChecker().getUpdateURL();
+					if(updated == null) {
+						JOptionPane.showMessageDialog(
+								RepaginateFrame.this,
+								"You are already running the latest version of Simplex Repaginator",
+								"No Update Available",
+								JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					if(JOptionPane.showConfirmDialog(
+							RepaginateFrame.this,
+							"An udated version of Simplex Repaginator is available at:\n\n" 
+							+ updated
+							+ "\n\nDownload new version?",
+							"Update Available",
+							JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+						Desktop.getDesktop().browse(updated.toURI());
+					}
+				} catch(Exception ex) {
+					JOptionPane.showMessageDialog(
+							RepaginateFrame.this,
+							"Unable to check for updates: " + ex,
+							"Update Check Failed",
+							JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		m.add(new AbstractAction("Exit") {
