@@ -4,7 +4,7 @@
 	<name>Simplex Repaginator</name>
 	<groupId>com.simplexrepaginator</groupId>
 	<artifactId>repaginate</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 
 	<properties>
 		<simplex.shaded.suffix>-${project.version}</simplex.shaded.suffix>

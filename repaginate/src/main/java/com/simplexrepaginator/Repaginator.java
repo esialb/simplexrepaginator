@@ -55,22 +55,6 @@ public class Repaginator {
 		List<PDPage> pages = new ArrayList<PDPage>();
 		doc.getDocumentCatalog().getPages().getAllKids(pages);
 		
-		List<PDPage> fronts = new ArrayList<PDPage>(); // front pages
-		List<PDPage> backs = new ArrayList<PDPage>(); // back pages
-		
-		int front = 0;
-		int back = (pages.size() / 2) * 2 - 1;
-		
-		while(front < pages.size()) {
-			fronts.add(pages.get(front));
-			front += 2;
-		}
-		
-		while(back >= 0) {
-			backs.add(pages.get(back));
-			back -= 2;
-		}
-		
 		PDDocument ret;
 		try {
 			ret = new PDDocument();
@@ -78,13 +62,17 @@ public class Repaginator {
 			throw new RepaginatorException("Unable to create PDDocument", ioe);
 		}
 		
-		// Add the front pages, e.g. 1,3,5,7
-		for(PDPage page : fronts) {
-			ret.addPage(page);
+		int front = 0;
+		int back = (pages.size() / 2) * 2 - 1;
+		
+		while(front < pages.size()) {
+			ret.addPage(pages.get(front));
+			front += 2;
 		}
-		// Add the back pages, e.g. 8,6,4,2
-		for(PDPage page : backs) {
-			ret.addPage(page);
+		
+		while(back >= 0) {
+			ret.addPage(pages.get(back));
+			back -= 2;
 		}
 		
 		return ret;
