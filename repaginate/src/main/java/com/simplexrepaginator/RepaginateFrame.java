@@ -280,12 +280,12 @@ public class RepaginateFrame extends JFrame {
 	
 	protected void setInput(List<File> files) {
 		repaginator.setInputFiles(files);
-		input.setText("<html><center>" + StringUtils.join(repaginator.getInputFiles(), "<br>"));
+		input.setText("<html><p align=left>" + StringUtils.join(repaginator.getInputFiles(), "<br>"));
 	}
 	
 	protected void setOutput(List<File> files) {
 		repaginator.setOutputFiles(files);
-		output.setText("<html><center>" + StringUtils.join(repaginator.getOutputFiles(), "<br>"));
+		output.setText("<html><p align=right>" + StringUtils.join(repaginator.getOutputFiles(), "<br>"));
 	}
 
 	private class UpdateCheckerAction extends AbstractAction {
