@@ -184,7 +184,12 @@ public class RepaginateFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					repaginator.repaginate();
+					int[] documentsPages = repaginator.repaginate();
+					JOptionPane.showMessageDialog(
+							RepaginateFrame.this,
+							"Repaginated " + documentsPages[0] + " documents with " + documentsPages[1] + " pages.",
+							"Repagination Complete",
+							JOptionPane.INFORMATION_MESSAGE);
 				} catch(Exception ex) {
 					ex.printStackTrace();
 					JOptionPane.showMessageDialog(
@@ -209,7 +214,12 @@ public class RepaginateFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					repaginator.unrepaginate();
+					int[] documentsPages = repaginator.unrepaginate();
+					JOptionPane.showMessageDialog(
+							RepaginateFrame.this,
+							"Unrepaginated " + documentsPages[0] + " documents with " + documentsPages[1] + " pages.",
+							"Unrepagination Complete",
+							JOptionPane.INFORMATION_MESSAGE);
 				} catch(Exception ex) {
 					ex.printStackTrace();
 					JOptionPane.showMessageDialog(
