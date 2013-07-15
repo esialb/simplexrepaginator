@@ -1,5 +1,6 @@
 package com.simplexrepaginator;
 
+import java.awt.Desktop;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -9,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -74,6 +77,19 @@ public class RepaginateFrame extends JFrame {
 		JMenu m;
 		
 		m = new JMenu("Help");
+		
+		m.add(new AbstractAction("Website") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					URL url = new URL("http://www.simplexrepaginator.com/");
+					Desktop.getDesktop().browse(url.toURI());
+				} catch(IOException ioe) {
+				} catch(URISyntaxException urise) {
+				}
+			}
+		});
+		
 		m.add(new AbstractAction("About") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
