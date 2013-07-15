@@ -10,5 +10,5 @@ results in a logical page ordering such as this: 1,3,5,7,8,6,4,2.
 This project will ingest that PDF file and produce one whose pages
 are in the logical order 1,2,3,4,5,6,7,8.
 
-Primary purpose is enable allow batch scanning of household files
-using inexpensive simplex document-feeder scanners.
+Primary purpose is enable batch scanning of household files using
+inexpensive simplex document-feeder scanners.
