@@ -6,6 +6,8 @@ import java.util.Properties;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
+import org.apache.commons.io.IOUtils;
+
 public class Repaginate {
 
 	public static void main(String[] args) {
@@ -25,12 +27,11 @@ public class Repaginate {
 	}
 
 	public static String getVersion() {
-		Properties p = new Properties();
 		try {
-			p.load(Repaginate.class.getResourceAsStream("version.properties"));
+			return IOUtils.toString(Repaginate.class.getResource("version.txt"));
 		} catch(IOException ioe) {
 		}
-		return p.getProperty("version", "Unknown Version");
+		return "Unknown Version";
 	}
 	
 }
