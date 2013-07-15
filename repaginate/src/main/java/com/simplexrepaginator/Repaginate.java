@@ -102,12 +102,12 @@ public class Repaginate {
 				System.exit(0);
 			}
 			
-			int count;
+			int [] documentsPages;
 			try {
 				if(cli.hasOption("unrepaginate"))
-					count = repaginator.unrepaginate();
+					documentsPages = repaginator.unrepaginate();
 				else
-					count = repaginator.repaginate();
+					documentsPages = repaginator.repaginate();
 			} catch(Exception ex) {
 				if(!cli.hasOption("quiet"))
 					System.out.println("Exception during command processing: " + ex);
@@ -115,7 +115,7 @@ public class Repaginate {
 				throw new Error("System.exit() didn't exit");
 			}
 			if(!cli.hasOption("quiet"))
-				System.out.println("Processed " + count + " documents");
+				System.out.println("Processed " + documentsPages[0] + " documents with " + documentsPages[1] + " pages.");
 			System.exit(0);
 		}
 	}

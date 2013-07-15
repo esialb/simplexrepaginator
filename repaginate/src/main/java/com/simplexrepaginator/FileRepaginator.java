@@ -62,7 +62,7 @@ public class FileRepaginator extends Repaginator {
 		return ret;
 	}
 
-	public int repaginate() throws RepaginatorException {
+	public int[] repaginate() throws RepaginatorException {
 		RepaginatorException rex = new RepaginatorException("Unable to repaginate");
 		
 		List<File[]> pairs;
@@ -72,7 +72,8 @@ public class FileRepaginator extends Repaginator {
 			throw rex.addCause(re);
 		}
 		
-		int count = 0;
+		int documents = 0;
+		int pages = 0;
 		
 		for(File[] io : pairs) {
 			File in = io[0];
@@ -82,9 +83,10 @@ public class FileRepaginator extends Repaginator {
 				PDDocument doc = PDDocument.load(in);
 				PDDocument rdoc = repaginated(doc);
 				rdoc.save(out);
+				pages += doc.getNumberOfPages();
 				rdoc.close();
 				doc.close();
-				count++;
+				documents++;
 			} catch(Exception ex) {
 				rex.addCause(ex);
 			}
@@ -93,10 +95,10 @@ public class FileRepaginator extends Repaginator {
 		if(rex.getCauses().size() > 0)
 			throw rex;
 		
-		return count;
+		return new int[] {documents, pages};
 	}
 
-	public int unrepaginate() throws RepaginatorException {
+	public int[] unrepaginate() throws RepaginatorException {
 		RepaginatorException rex = new RepaginatorException("Unable to unrepaginate");
 		
 		List<File[]> pairs;
@@ -106,7 +108,8 @@ public class FileRepaginator extends Repaginator {
 			throw rex.addCause(re);
 		}
 		
-		int count = 0;
+		int documents = 0;
+		int pages = 0;
 		
 		for(File[] io : pairs) {
 			File in = io[0];
@@ -116,9 +119,10 @@ public class FileRepaginator extends Repaginator {
 				PDDocument doc = PDDocument.load(in);
 				PDDocument rdoc = unrepaginated(doc);
 				rdoc.save(out);
+				pages += doc.getNumberOfPages();
 				rdoc.close();
 				doc.close();
-				count++;
+				documents++;
 			} catch(Exception ex) {
 				rex.addCause(ex);
 			}
@@ -127,7 +131,7 @@ public class FileRepaginator extends Repaginator {
 		if(rex.getCauses().size() > 0)
 			throw rex;
 		
-		return count;
+		return new int[] {documents, pages};
 	}
 
 	public List<File> getInputFiles() {
