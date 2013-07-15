@@ -20,7 +20,7 @@ public class Repaginator {
 	 * @param doc The document to repaginate
 	 * @return A new document, with the proper pagination
 	 */
-	public PDDocument repaginated(PDDocument doc) {
+	public PDDocument repaginated(PDDocument doc) throws RepaginatorException {
 		List<PDPage> pages = new ArrayList<PDPage>();
 		doc.getDocumentCatalog().getPages().getAllKids(pages);
 		
@@ -28,16 +28,16 @@ public class Repaginator {
 		try {
 			ret = new PDDocument();
 		} catch(IOException ioe) {
-			throw new RuntimeException("Unable to create PDDocument", ioe);
+			throw new RepaginatorException("Unable to create PDDocument", ioe);
 		}
 
 		int front = 0;
 		int back = pages.size() - 1;
 		
 		// Grab alternating pages from the front and back of the list
-		while(front < back) {
+		while(front <= back) {
 			ret.addPage(pages.get(front++));
-			if(front < back)
+			if(front <= back)
 				ret.addPage(pages.get(back--));
 		}
 		
@@ -51,7 +51,7 @@ public class Repaginator {
 	 * @param doc
 	 * @return
 	 */
-	public PDDocument unrepaginated(PDDocument doc) {
+	public PDDocument unrepaginated(PDDocument doc) throws RepaginatorException {
 		List<PDPage> pages = new ArrayList<PDPage>();
 		doc.getDocumentCatalog().getPages().getAllKids(pages);
 		
@@ -59,20 +59,23 @@ public class Repaginator {
 		List<PDPage> backs = new ArrayList<PDPage>(); // back pages
 		
 		int front = 0;
-		int back = pages.size() - 1;
+		int back = (pages.size() / 2) * 2 - 1;
 		
-		// Grab alternating pages from the front and back of the list
-		while(front < back) {
-			fronts.add(pages.get(front++));
-			if(front < back)
-				backs.add(pages.get(back--));
+		while(front < pages.size()) {
+			fronts.add(pages.get(front));
+			front += 2;
+		}
+		
+		while(back >= 0) {
+			backs.add(pages.get(back));
+			back -= 2;
 		}
 		
 		PDDocument ret;
 		try {
 			ret = new PDDocument();
 		} catch(IOException ioe) {
-			throw new RuntimeException("Unable to create PDDocument", ioe);
+			throw new RepaginatorException("Unable to create PDDocument", ioe);
 		}
 		
 		// Add the front pages, e.g. 1,3,5,7
