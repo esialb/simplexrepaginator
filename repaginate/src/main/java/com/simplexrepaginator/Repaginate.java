@@ -1,5 +1,7 @@
 package com.simplexrepaginator;
 
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Main entry point.
@@ -28,17 +31,18 @@ public class Repaginate {
 		opt.addOption("o", "out", true, "Output file/directory.  May be repeated, or separated with " + File.pathSeparator);
 		opt.addOption("b", "batch", false, "Perform batch processing, without the GUI.");
 		opt.addOption("u", "unrepaginate", false, "In batch mode, unrepaginate rather than repaginate.");
+		opt.addOption("q", "quiet", false, "Quiet operation.  In batch mode, will produce no console output.");
 	}
 
 	public static void main(String[] args) {
 		try {
-			_main(args);
+			System.exit(_main(args));
 		} catch(Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
-	private static void _main(String[] args) throws Exception {
+	private static int _main(String[] args) throws Exception {
 		// use system look and feel.  Shouldn't fail.
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
@@ -47,7 +51,7 @@ public class Repaginate {
 
 		if(cli.hasOption("help")) {
 			new HelpFormatter().printHelp("java -jar SimplexRepaginator-" + getVersion() + ".jar [options] [inputfile...]", "Simplex Repaginator", opt, "(c) 2013 Robin Kirkman");
-			return;
+			return 0;
 		}
 
 		FileRepaginator repaginator = new FileRepaginator();
@@ -80,7 +84,7 @@ public class Repaginate {
 			repaginator.setOutputFiles(input);
 		}
 
-		if(!cli.hasOption("batch")) {
+		if(!cli.hasOption("batch") && !GraphicsEnvironment.isHeadless()) {
 			// Frame which overrides #dispose() to exit
 			RepaginateFrame frame = new RepaginateFrame(repaginator) {
 				@Override
@@ -93,17 +97,31 @@ public class Repaginate {
 			frame.setVisible(true);
 		} else {
 			if(input.size() == 0) {
-				System.out.println("No input files.  Try --help");
-				return;
+				if(!cli.hasOption("quiet"))
+					System.out.println("No input files.  Try --help");
+				return 0;
 			}
 			
 			int count;
-			if(cli.hasOption("unrepaginate"))
-				count = repaginator.unrepaginate();
-			else
-				count = repaginator.repaginate();
-			System.out.println("Processed " + count + " documents");
+			try {
+				if(cli.hasOption("unrepaginate"))
+					count = repaginator.unrepaginate();
+				else
+					count = repaginator.repaginate();
+			} catch(RepaginatorException re) {
+				if(!cli.hasOption("quiet"))
+					System.out.println("Exceptions during command processing:\n\t" + StringUtils.join(re.getCauses(), "\n\t"));
+				return -1;
+			} catch(Exception ex) {
+				if(!cli.hasOption("quiet"))
+					System.out.println("Exception during command processing:\n\t" + ex);
+				return -1;
+			}
+			if(!cli.hasOption("quiet"))
+				System.out.println("Processed " + count + " documents");
 		}
+		
+		return 0;
 	}
 
 	/**
