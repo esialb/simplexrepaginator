@@ -126,14 +126,14 @@ public class RepaginateFrame extends JFrame {
 		b.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				repaginate();
+				repaginate(true);
 			}
 		});
 		
 		return b;
 	}
 
-	protected void repaginate() {
+	public void repaginate(boolean gui) {
 		Repaginator repaginator = new Repaginator();
 
 		List<File[]> pairs;
@@ -162,11 +162,18 @@ public class RepaginateFrame extends JFrame {
 			}
 		}
 
-		if(exs.size() > 0) {
-			JOptionPane.showMessageDialog(this, StringUtils.join(exs, "\n"));
+		if(gui) {
+			if(exs.size() > 0) {
+				JOptionPane.showMessageDialog(this, StringUtils.join(exs, "\n"));
+			}
+
+			JOptionPane.showMessageDialog(this, "Repaginated " + count + " documents");
+		} else {
+			for(Exception ex : exs) {
+				System.out.println("Exception in processing:" + ex);
+			}
+			System.out.println("Repaginated " + count + " documents");
 		}
-		
-		JOptionPane.showMessageDialog(this, "Repaginated " + count + " documents");
 	}
 
 	protected JButton createUnrepaginateButton() {
@@ -175,14 +182,14 @@ public class RepaginateFrame extends JFrame {
 		b.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				unrepaginate();
+				unrepaginate(true);
 			}
 		});
 
 		return b;
 	}
 	
-	protected void unrepaginate() {
+	public void unrepaginate(boolean gui) {
 		Repaginator repaginator = new Repaginator();
 
 		List<File[]> pairs;
@@ -211,11 +218,19 @@ public class RepaginateFrame extends JFrame {
 			}
 		}
 
-		if(exs.size() > 0) {
-			JOptionPane.showMessageDialog(this, StringUtils.join(exs, "\n"));
+		if(gui) {
+			if(exs.size() > 0) {
+				JOptionPane.showMessageDialog(this, StringUtils.join(exs, "\n"));
+			}
+
+			JOptionPane.showMessageDialog(this, "Unrepaginated " + count + " documents");
+		} else {
+			for(Exception ex : exs) {
+				System.out.println("Exception in processing:" + ex);
+			}
+			System.out.println("Unrepaginated " + count + " documents");
+			
 		}
-		
-		JOptionPane.showMessageDialog(this, "Repaginated " + count + " documents");
 	}
 
 	protected JButton createInputButton() {
