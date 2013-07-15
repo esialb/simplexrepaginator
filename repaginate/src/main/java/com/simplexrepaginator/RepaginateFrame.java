@@ -20,12 +20,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 
 import org.apache.commons.io.FileUtils;
@@ -43,7 +46,12 @@ import org.apache.pdfbox.pdmodel.PDDocument;
  *
  */
 public class RepaginateFrame extends JFrame {
-	private static IOFileFilter IS_PDF_FILE = new SuffixFileFilter("pdf", IOCase.INSENSITIVE);
+	private static final IOFileFilter IS_PDF_FILE = new SuffixFileFilter("pdf", IOCase.INSENSITIVE);
+	
+	private static final Icon REPAGINATE_ICON = new ImageIcon(RepaginateFrame.class.getResource("repaginate.png"));
+	private static final Icon UNREPAGINATE_ICON = new ImageIcon(RepaginateFrame.class.getResource("unrepaginate.png"));
+	private static final Icon PDF_1342 = new ImageIcon(RepaginateFrame.class.getResource("pdf1342.png"));
+	private static final Icon PDF_1234 = new ImageIcon(RepaginateFrame.class.getResource("pdf1234.png"));
 	
 	protected JButton input;
 	protected JButton repaginate;
@@ -67,11 +75,11 @@ public class RepaginateFrame extends JFrame {
 
 		setLayout(new GridBagLayout());
 
-		GridBagConstraints c = new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(10, 10, 10, 10), 10, 10);
+		GridBagConstraints c = new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0);
 
 		c.gridwidth = 2; add(input, c);
 
-		c.gridy++; c.gridwidth = 1; c.fill = GridBagConstraints.NONE; add(repaginate, c);
+		c.gridy++; c.gridwidth = 1; c.fill = GridBagConstraints.VERTICAL; add(repaginate, c);
 		c.gridx++; add(unrepaginate, c);
 
 		c.gridy++; c.gridx = 0; c.gridwidth = 2; c.fill = GridBagConstraints.BOTH; add(output, c);
@@ -123,8 +131,11 @@ public class RepaginateFrame extends JFrame {
 	}
 	
 	protected JButton createRepaginateButton() {
-		JButton b = new JButton("<html><center>Click to<br>repaginate");
+		JButton b = new JButton("<html><center>Click to<br>repaginate", REPAGINATE_ICON);
 
+		b.setHorizontalTextPosition(SwingConstants.LEFT);
+		b.setIconTextGap(25);
+		
 		b.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -145,8 +156,11 @@ public class RepaginateFrame extends JFrame {
 	}
 
 	protected JButton createUnrepaginateButton() {
-		JButton b = new JButton("<html><center>Click to<br>un-repaginate");
+		JButton b = new JButton("<html><center>Click to<br>un-repaginate", UNREPAGINATE_ICON);
 
+		b.setHorizontalTextPosition(SwingConstants.RIGHT);
+		b.setIconTextGap(25);
+		
 		b.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -167,8 +181,11 @@ public class RepaginateFrame extends JFrame {
 	}
 	
 	protected JButton createInputButton() {
-		JButton b = new JButton("Click or drag to set input files");
+		JButton b = new JButton("Click or drag to set input files", PDF_1342);
 
+		b.setHorizontalTextPosition(SwingConstants.RIGHT);
+		b.setIconTextGap(25);
+		
 		b.setTransferHandler(new InputButtonTransferHandler());
 		
 		b.addActionListener(new ActionListener() {
@@ -194,8 +211,11 @@ public class RepaginateFrame extends JFrame {
 	}
 
 	protected JButton creatOutputButton() {
-		JButton b = new JButton("Click or drag to set output file");
+		JButton b = new JButton("Click or drag to set output file", PDF_1234);
 
+		b.setHorizontalTextPosition(SwingConstants.LEFT);
+		b.setIconTextGap(25);
+		
 		b.setTransferHandler(new OutputButtonTransferHandler());
 		
 		b.addActionListener(new ActionListener() {

@@ -36,13 +36,13 @@ public class Repaginate {
 
 	public static void main(String[] args) {
 		try {
-			System.exit(_main(args));
+			_main(args);
 		} catch(Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
-	private static int _main(String[] args) throws Exception {
+	private static void _main(String[] args) throws Exception {
 		// use system look and feel.  Shouldn't fail.
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
@@ -51,7 +51,7 @@ public class Repaginate {
 
 		if(cli.hasOption("help")) {
 			new HelpFormatter().printHelp("java -jar SimplexRepaginator-" + getVersion() + ".jar [options] [inputfile...]", "Simplex Repaginator", opt, "(c) 2013 Robin Kirkman");
-			return 0;
+			System.exit(0);
 		}
 
 		FileRepaginator repaginator = new FileRepaginator();
@@ -99,7 +99,7 @@ public class Repaginate {
 			if(input.size() == 0) {
 				if(!cli.hasOption("quiet"))
 					System.out.println("No input files.  Try --help");
-				return 0;
+				System.exit(0);
 			}
 			
 			int count;
@@ -111,13 +111,13 @@ public class Repaginate {
 			} catch(Exception ex) {
 				if(!cli.hasOption("quiet"))
 					System.out.println("Exception during command processing: " + ex);
-				return -1;
+				System.exit(-1);
+				throw new Error("System.exit() didn't exit");
 			}
 			if(!cli.hasOption("quiet"))
 				System.out.println("Processed " + count + " documents");
+			System.exit(0);
 		}
-		
-		return 0;
 	}
 
 	/**
