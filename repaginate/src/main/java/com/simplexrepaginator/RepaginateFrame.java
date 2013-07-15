@@ -1,5 +1,6 @@
 package com.simplexrepaginator;
 
+import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -24,12 +25,16 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.ProgressMonitor;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 
@@ -131,37 +136,7 @@ public class RepaginateFrame extends JFrame {
 				output.doClick();
 			}
 		});
-		m.add(new AbstractAction("Check For Updates") {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-					URL updated = new UpdateChecker().getUpdateURL();
-					if(updated == null) {
-						JOptionPane.showMessageDialog(
-								RepaginateFrame.this,
-								"You are already running the latest version of Simplex Repaginator",
-								"No Update Available",
-								JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					if(JOptionPane.showConfirmDialog(
-							RepaginateFrame.this,
-							"An udated version of Simplex Repaginator is available at:\n\n" 
-							+ updated
-							+ "\n\nDownload new version?",
-							"Update Available",
-							JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-						Desktop.getDesktop().browse(updated.toURI());
-					}
-				} catch(Exception ex) {
-					JOptionPane.showMessageDialog(
-							RepaginateFrame.this,
-							"Unable to check for updates: " + ex,
-							"Update Check Failed",
-							JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		});
+		m.add(new UpdateCheckerAction());
 		m.add(new AbstractAction("Exit") {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -311,6 +286,87 @@ public class RepaginateFrame extends JFrame {
 	protected void setOutput(List<File> files) {
 		repaginator.setOutputFiles(files);
 		output.setText("<html><center>" + StringUtils.join(repaginator.getOutputFiles(), "<br>"));
+	}
+
+	private class UpdateCheckerAction extends AbstractAction {
+		private UpdateCheckerAction() {
+			super("Check For Updates");
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Runnable r = new Runnable() {
+				@Override
+				public void run() {
+					final JDialog pmd = new JDialog(RepaginateFrame.this);
+					pmd.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+					pmd.setLayout(new BorderLayout());
+					JProgressBar pb = new JProgressBar();
+					pb.setIndeterminate(true);
+					pb.setStringPainted(true);
+					pb.setString("Checking for updates...");
+					pmd.add(pb, BorderLayout.CENTER);
+					pmd.pack();
+					pmd.setSize(300, 100);
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							pmd.setVisible(true);
+							pmd.setLocationRelativeTo(RepaginateFrame.this);
+						}
+					});
+					try {
+						final URL url = new UpdateChecker().getUpdateURL();
+						EventQueue.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								if(pmd.isVisible()) {
+									pmd.setVisible(false);
+									updateChecked(url);
+								}
+							}
+						});
+					} catch(IOException ioe) {
+					} finally {
+						EventQueue.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								pmd.setVisible(false);
+							}
+						});
+					}
+				}
+			};
+			new Thread(r).start();
+		}
+		
+		public void updateChecked(URL updated) {
+			try {
+				if(updated == null) {
+					JOptionPane.showMessageDialog(
+							RepaginateFrame.this,
+							"You are already running the latest version of Simplex Repaginator",
+							"No Update Available",
+							JOptionPane.INFORMATION_MESSAGE);
+					return;
+				}
+				if(JOptionPane.showConfirmDialog(
+						RepaginateFrame.this,
+						"An udated version of Simplex Repaginator is available at:\n\n" 
+						+ updated
+						+ "\n\nDownload new version?",
+						"Update Available",
+						JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+					Desktop.getDesktop().browse(updated.toURI());
+				}
+			} catch(Exception ex) {
+				JOptionPane.showMessageDialog(
+						RepaginateFrame.this,
+						"Unable to check for updates: " + ex,
+						"Update Check Failed",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
 	}
 
 	protected class InputButtonTransferHandler extends TransferHandler {
