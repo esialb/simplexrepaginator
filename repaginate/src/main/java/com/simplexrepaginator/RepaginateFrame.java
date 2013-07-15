@@ -299,6 +299,7 @@ public class RepaginateFrame extends JFrame {
 				@Override
 				public void run() {
 					final JDialog pmd = new JDialog(RepaginateFrame.this);
+					pmd.setTitle("Checking for Updates");
 					pmd.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 					pmd.setLayout(new BorderLayout());
 					JProgressBar pb = new JProgressBar();
