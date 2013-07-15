@@ -105,6 +105,37 @@ public class RepaginateFrame extends JFrame {
 				output.doClick();
 			}
 		});
+		m.add(new AbstractAction("Check For Updates") {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					URL updated = new UpdateChecker().checkForUpdates();
+					if(updated == null) {
+						JOptionPane.showMessageDialog(
+								RepaginateFrame.this,
+								"You are already running the latest version of Simplex Repaginator",
+								"No Update Available",
+								JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					if(JOptionPane.showConfirmDialog(
+							RepaginateFrame.this,
+							"An udated version of Simplex Repaginator is available at:\n\n" 
+							+ updated
+							+ "\n\nDownload new version?",
+							"Update Available",
+							JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+						Desktop.getDesktop().browse(updated.toURI());
+					}
+				} catch(Exception ex) {
+					JOptionPane.showMessageDialog(
+							RepaginateFrame.this,
+							"Unable to check for updates: " + ex,
+							"Update Check Failed",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		m.add(new AbstractAction("Exit") {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
